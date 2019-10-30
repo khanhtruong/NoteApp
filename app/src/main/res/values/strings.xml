@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">NoteApp</string>
+    <string name="lbl_list_note">List Note</string>
+    <string name="lbl_take_note">Take a note...</string>
+    <string name="lbl_empty_description">Add your notes now</string>
+    <string name="lbl_title">Title</string>
+    <string name="lbl_loading_webview">Loading Web View</string>
+    <string name="lbl_editor">Editor</string>
 </resources>
