@@ -1,0 +1,9 @@
+body {
+    background-color: #272727;
+}
+div.editor {
+    color: #CECECE;
+    width: 90%;
+    height: 90%;
+    position: absolute;
+}
