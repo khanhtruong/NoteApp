@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.truongkhanh.noteapp.model.Note
 import kotlinx.android.synthetic.main.item_list_note.view.*
 
-class ListNoteViewHolder(view: View, itemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(view) {
+class ListNoteViewHolder(view: View, itemLongClickListener: (Pair<View, Note>) -> Unit, itemClickListener: (Note) -> Unit) : RecyclerView.ViewHolder(view) {
 
     val title: TextView = view.tvTitle
     val content: TextView = view.tvContent
@@ -18,6 +18,12 @@ class ListNoteViewHolder(view: View, itemClickListener: (Note) -> Unit) : Recycl
             data?.let {
                 itemClickListener(it)
             }
+        }
+        view.setOnLongClickListener {mView ->
+            data?.let {note ->
+                itemLongClickListener(Pair(mView, note))
+            }
+            true
         }
     }
 }

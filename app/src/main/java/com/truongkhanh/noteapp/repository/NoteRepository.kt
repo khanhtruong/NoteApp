@@ -15,7 +15,5 @@ class NoteRepository (private val noteDao: NoteDao) {
 
     fun update(note: Note): Completable = noteDao.update(note)
 
-    suspend fun delete(note: Note) {
-        noteDao.delete(note)
-    }
+    fun delete(note: Note): Completable = noteDao.delete(note)
 }
