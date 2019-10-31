@@ -20,5 +20,5 @@ interface NoteDao {
     fun insert(note: Note): Completable
 
     @Delete
-    suspend fun delete(note: Note)
+    fun delete(note: Note): Completable
 }

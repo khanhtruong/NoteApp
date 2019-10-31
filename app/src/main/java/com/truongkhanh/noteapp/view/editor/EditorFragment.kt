@@ -1,6 +1,7 @@
 package com.truongkhanh.noteapp.view.editor
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -104,7 +105,6 @@ class EditorFragment : BaseFragment() {
                 super.onPageFinished(view, url)
                 getNoteBundle()
                 rlEmpty.visibility = getEnableView(false)
-                clEditorContent.visibility = getEnableView(true)
             }
         }
     }
@@ -117,7 +117,7 @@ class EditorFragment : BaseFragment() {
         etTitle.addTextChangedListener(textWatcher)
     }
 
-    private fun getData() {
+    fun getData() {
         val script = "(function() {return window.editor.getData();}) ();"
         wvMain.evaluateJavascript(script, getValueCallback)
     }

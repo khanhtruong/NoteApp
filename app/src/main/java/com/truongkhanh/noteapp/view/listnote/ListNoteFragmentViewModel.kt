@@ -36,10 +36,18 @@ class ListNoteFragmentViewModel(private val context: Context) : ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                Log.d("Debuggg", "Insert successfully")
                 _navigateToActivity.value = Event(note)
             }
             .disposedBy(bag)
+    }
+
+    fun delete(note: Note) {
+        noteRepository.delete(note)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                listNote = noteRepository.listNote
+            }.disposedBy(bag)
     }
 
     class Factory(private val context: Context) : ViewModelProvider.NewInstanceFactory() {

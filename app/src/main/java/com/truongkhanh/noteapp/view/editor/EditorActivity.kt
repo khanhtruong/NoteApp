@@ -18,4 +18,9 @@ class EditorActivity : BaseNoAppBarActivity() {
             replaceFragment(R.id.fragmentContainer, editorFragment)
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        editorFragment.getData()
+    }
 }

@@ -2,6 +2,7 @@ package com.truongkhanh.noteapp.view.listnote
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +17,16 @@ import com.truongkhanh.noteapp.util.getEnableView
 import com.truongkhanh.noteapp.view.editor.EditorActivity
 import com.truongkhanh.noteapp.view.listnote.adapter.ListNoteAdapter
 import kotlinx.android.synthetic.main.fragment_list_note.*
+import androidx.appcompat.widget.PopupMenu
+
 
 class ListNoteFragment : BaseFragment() {
 
     private lateinit var listNoteFragmentViewModel: ListNoteFragmentViewModel
     private var listNoteAdapter: ListNoteAdapter? = null
+    private val itemLongClickListener: (Pair<View, Note>) -> Unit = {pair ->
+        showMenu(pair)
+    }
 
     companion object {
         fun getInstance() = ListNoteFragment()
@@ -64,7 +70,7 @@ class ListNoteFragment : BaseFragment() {
     private fun initRecyclerView() {
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rvListNote.layoutManager = layoutManager
-        listNoteAdapter = ListNoteAdapter {data ->
+        listNoteAdapter = ListNoteAdapter(itemLongClickListener) {data ->
             navigateToEditor(data)
         }
         rvListNote.adapter = listNoteAdapter
@@ -72,8 +78,28 @@ class ListNoteFragment : BaseFragment() {
 
     private fun initListener() {
         btnCreateNote.setOnClickListener {
-            listNoteFragmentViewModel.create(Note(0, "Default title", "<p>Example content</p>"))
+            createNewNote()
         }
+        btnCreate.setOnClickListener {
+            createNewNote()
+        }
+    }
+
+    private fun createNewNote() {
+        listNoteFragmentViewModel.create(Note(0, "", ""))
+    }
+
+    private fun showMenu(pair: Pair<View, Note>) {
+        val popup = PopupMenu(context!!, pair.first, Gravity.END)
+
+        popup.menuInflater
+            .inflate(R.menu.menu_delete_note, popup.menu)
+
+        popup.setOnMenuItemClickListener {
+            listNoteFragmentViewModel.delete(pair.second)
+            true
+        }
+        popup.show()
     }
 
     private fun navigateToEditor(note: Note) {
