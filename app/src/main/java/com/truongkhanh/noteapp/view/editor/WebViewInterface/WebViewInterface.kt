@@ -1,12 +1,15 @@
 package com.truongkhanh.noteapp.view.editor.WebViewInterface
 
-import android.util.Log
 import android.webkit.JavascriptInterface
 
-class WebViewInterface {
+class WebViewInterface(private val listener: InteractionListener) {
+
+    interface InteractionListener {
+        fun editorFinishLoading()
+    }
 
     @JavascriptInterface
-    fun sendData(data: String) {
-        Log.d("Debuggg", data)
+    fun editorFinishLoading() {
+        listener.editorFinishLoading()
     }
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Editor</title>
+    <script type="text/javascript" src="https://truong.khanh.com/truongkhanh/assets/ckeditor5-build-classic/build/ckeditor.js"></script>
+    <style>
+        .ck-editor__editable {
+            color: #CECECE;
+            background-color: #272727 !important;
+        }
+        body {
+            background-color: #272727;
+        }
+    </style>
+</head>
+<body>
+    <div name="content" id="editor" class="editor"></div>
+    <script>
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                cloudServices: {
+                    tokenUrl: 'https://43006.cke-cs.com/token/dev/KPXKWtiouoPLV01vrgjblKrs23FxOPwCumZzwnZr93mhtkbgWWoeTG73ECLD',
+                    uploadUrl: 'https://43006.cke-cs.com/easyimage/upload/'
+                }
+            })
+            .then(editor => {
+                window.editor = editor;
+                MyInterface.editorFinishLoading();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+</body>
+
+</html>

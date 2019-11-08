@@ -1,18 +1,15 @@
 package com.truongkhanh.noteapp.view.editor
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.ValueCallback
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.webkit.WebViewAssetLoader
 import com.truongkhanh.noteapp.base.BaseFragment
 import com.truongkhanh.noteapp.R
 import com.truongkhanh.noteapp.util.BUNDLE_NOTE
@@ -20,9 +17,11 @@ import com.truongkhanh.noteapp.util.getEnableView
 import com.truongkhanh.noteapp.util.removeUTFCharacters
 import com.truongkhanh.noteapp.view.editor.WebViewInterface.WebViewInterface
 import kotlinx.android.synthetic.main.fragment_editor.*
+import android.net.Uri
+import android.webkit.*
 
 
-class EditorFragment : BaseFragment() {
+class EditorFragment : BaseFragment(), WebViewInterface.InteractionListener {
 
     private lateinit var webViewInterface: WebViewInterface
     private lateinit var editorFragmentViewModel: EditorFragmentViewModel
@@ -35,14 +34,12 @@ class EditorFragment : BaseFragment() {
         )
         editorFragmentViewModel.updateCurrentNote()
     }
-    private val setValueCallback = ValueCallback<String> { Unit }
     private val textWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {
             editorFragmentViewModel.title.postValue(
                 s.toString()
             )
         }
-
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
     }
@@ -66,6 +63,7 @@ class EditorFragment : BaseFragment() {
 
     override fun setUpView(view: View, savedInstanceState: Bundle?) {
         bindingViewModel()
+        webViewListener()
         initWebView()
         setUpListener()
     }
@@ -96,15 +94,20 @@ class EditorFragment : BaseFragment() {
             getData()
         }
         textChangeListener()
-        webViewListener()
     }
 
     private fun webViewListener() {
+        wvMain.clearCache(true)
         wvMain.webViewClient = object: WebViewClient(){
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                getNoteBundle()
-                rlEmpty.visibility = getEnableView(false)
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: WebResourceRequest
+            ): WebResourceResponse? {
+                val assetLoader = WebViewAssetLoader.Builder()
+                    .setDomain("truong.khanh.com")
+                    .addPathHandler("/truongkhanh/assets/", WebViewAssetLoader.AssetsPathHandler(view.context))
+                    .build()
+                return assetLoader.shouldInterceptRequest(request.url)
             }
         }
     }
@@ -124,16 +127,34 @@ class EditorFragment : BaseFragment() {
 
     private fun setData(content: String) {
         val script = "(function() {window.editor.setData('$content');}) ();"
-        wvMain.evaluateJavascript(script, setValueCallback)
+        wvMain.evaluateJavascript(script, null)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
+//        wvMain.settings.allowUniversalAccessFromFileURLs = false
+//        wvMain.settings.allowFileAccess = false
+//        wvMain.settings.allowContentAccess = false
+//        wvMain.settings.allowFileAccessFromFileURLs = false
         wvMain.settings.javaScriptEnabled = true
-        webViewInterface = WebViewInterface()
-        wvMain.clearCache(true)
-        wvMain.loadUrl("file:///android_asset/main.html")
+        webViewInterface = WebViewInterface(this)
         wvMain.addJavascriptInterface(webViewInterface, "MyInterface")
+
+        val uri = Uri.Builder()
+            .scheme("https")
+            .authority("truong.khanh.com")
+            .appendPath("truongkhanh")
+            .appendPath("assets")
+            .appendPath("www")
+            .appendPath("main.html")
+            .build()
+        wvMain.loadUrl(uri.toString())
     }
 
+    override fun editorFinishLoading() {
+        activity?.runOnUiThread {
+            getNoteBundle()
+            rlEmpty.visibility = getEnableView(false)
+        }
+    }
 }
